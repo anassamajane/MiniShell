@@ -1,0 +1,54 @@
+#ifndef LEXER_H
+#define LEXER_H
+
+# include <stdio.h>
+# include <stdlib.h>
+# include <readline/readline.h>
+# include <readline/history.h>
+# include <stdbool.h>
+# include <stddef.h>
+# include "libft/libft.h"
+
+
+typedef enum e_token_type
+{
+	T_WORD,
+	T_PIPE,
+	T_REDIR_IN, // <
+	T_REDIR_OUT, // >
+	T_APPEND, // >>
+	T_HEREDOC, // <<
+	T_UNKNOWN
+}	t_token_type;
+
+typedef struct s_token
+{
+	char	*value;
+	t_token_type	type;
+	bool	was_quoted;
+	bool	was_single_quoted;
+}	t_token;
+
+char    *ft_strndup(char *str, size_t n);
+int     is_operator(char c);
+int     is_space(char c);
+
+void    handle_quoted_token(t_list **tokens, char *input, int *i);
+void    handle_word_token(t_list **tokens, char *input, int *i);
+void    handle_operator_token(t_list **tokens, char *input, int *i);
+
+t_list  *create_token(char *value, t_token_type type, bool was_quoted, bool was_single_quoted);
+t_list  *tokenize_input(char *input);
+
+void    free_tokens(t_list *tokens);
+const char      *token_type_to_str(t_token_type type);
+void    print_tokens(t_list *tokens);
+
+
+bool    syntax_is_valid(t_list *tokens);
+bool    check_pipe_syntax(t_list *token);
+bool    check_redirection_syntax(t_list *tokens);
+bool    check_invalid_sequences(t_list *tokens);
+bool    check_heredoc_delimiter(t_list *tokens);
+
+#endif

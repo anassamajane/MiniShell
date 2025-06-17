@@ -43,7 +43,7 @@ bool	check_redirection_syntax(t_list *tokens)
 	if (tokens)
 	{
 		curr = (t_token *)tokens->content;
-		if (is_redirection(curr->type))
+		if (is_redirection(curr->type)) // redir at the end ==> (echo >>)
 			return (false);
 	}
 	return (true);
@@ -60,8 +60,8 @@ bool	check_invalid_sequences(t_list *tokens)
 		next = (t_token *)tokens->next->content;
 		if (is_redirection(curr->type) && is_redirection(next->type)) // redir followed by a redir
 			return (false); // example : (><) (>> <)
-		if (curr->type == T_PIPE && is_redirection(next->type)) // pipe followed by a redir
-			return (false); // example : (| >>) (| <)
+		//if (curr->type == T_PIPE && is_redirection(next->type)) // pipe followed by a redir
+		//	return (false); // example : (| >>) (| <)
 		tokens = tokens->next;
 	}
 	return (true);

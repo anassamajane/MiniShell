@@ -37,6 +37,7 @@ void	handle_quoted_token(t_token **tokens, char *input, int *i)
 	int	start;
 	int	len;
 	char	*value;
+	t_token	*new_token;
 
 	quote_char = input[*i];
 	(*i)++; //skip quote
@@ -47,7 +48,13 @@ void	handle_quoted_token(t_token **tokens, char *input, int *i)
 	value = ft_strndup(input + start, len);
 	if (!value)
 		return ;
-	token_add_back(tokens, token_new(value, T_WORD, true, quote_char == '\''));
+	new_token = token_new(value, T_WORD, true, quote_char == '\'');
+	if (!new_token)
+	{
+		free(value);
+		return ;
+	}
+	token_add_back(tokens, new_token);
 	/*token->was_quoted = true;
 	if (quote_char == '\'')
 		token->was_single_quoted = true;*/
@@ -59,6 +66,7 @@ void	handle_word_token(t_token **tokens, char *input, int *i)
 {
 	int	start;
 	char	*value;
+	t_token	*new_token;
 
 	start = *i;
 	while (input[*i] && !is_space(input[*i]) && !is_operator(input[*i]) && input[*i] != '\'' && input[*i] != '"')
@@ -66,13 +74,20 @@ void	handle_word_token(t_token **tokens, char *input, int *i)
 	value = ft_strndup(input + start, *i - start);
 	if (!value)
 		return ;
-	token_add_back(tokens, token_new(value, T_WORD, false, false));
+	new_token = token_new(value, T_WORD, false, false);
+	if (!new_token)
+	{
+		free(value);
+		return ;
+	}
+	token_add_back(tokens, new_token);
 }
 
 void	handle_operator_token(t_token **tokens, char *input, int *i)
 {
 	char	*value;
 	t_token_type	type;
+	t_token	*new_token;
 
 	if (input[*i] == '|')
 	{
@@ -112,7 +127,13 @@ void	handle_operator_token(t_token **tokens, char *input, int *i)
 	}
 	if (!value)
 		return ;
-	token_add_back(tokens, token_new(value, type, false, false));
+	new_token = token_new(value, type, false, false);
+	if (!new_token)
+	{
+		free(value);
+		return ;
+	}
+	token_add_back(tokens, new_token);
 }
 
 

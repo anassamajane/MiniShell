@@ -1,6 +1,5 @@
 #include "lexer.h"
 
-
 char    *ft_strndup(char *str, size_t n)
 {
         size_t  i;
@@ -32,13 +31,12 @@ int	is_space(char c)
 	return (c == ' ' || (c >= 9 && c <= 13));
 }
 
-void	handle_quoted_token(t_list **tokens, char *input, int *i)
+void	handle_quoted_token(t_token **tokens, char *input, int *i)
 {
 	char	quote_char;
 	int	start;
 	int	len;
 	char	*value;
-	t_token	*token;
 
 	quote_char = input[*i];
 	(*i)++; //skip quote
@@ -49,23 +47,15 @@ void	handle_quoted_token(t_list **tokens, char *input, int *i)
 	value = ft_strndup(input + start, len);
 	if (!value)
 		return ;
-	token = malloc(sizeof(t_token));
-	if (!token)
-	{
-		free(value);
-		return ;
-	}
-	token->value = value;
-	token->type = T_WORD;
-	token->was_quoted = true;
+	token_add_back(tokens, token_new(value, T_WORD, true, quote_char == '\''));
+	/*token->was_quoted = true;
 	if (quote_char == '\'')
-		token->was_single_quoted = true;
-	ft_lstadd_back(tokens, ft_lstnew(token));
+		token->was_single_quoted = true;*/
 	if (input[*i] == quote_char)
 		(*i)++; //skip closing quote
 }
 
-void	handle_word_token(t_list **tokens, char *input, int *i)
+void	handle_word_token(t_token **tokens, char *input, int *i)
 {
 	int	start;
 	char	*value;
@@ -76,10 +66,10 @@ void	handle_word_token(t_list **tokens, char *input, int *i)
 	value = ft_strndup(input + start, *i - start);
 	if (!value)
 		return ;
-	ft_lstadd_back(tokens, create_token(value, T_WORD, false, false));
+	token_add_back(tokens, token_new(value, T_WORD, false, false));
 }
 
-void	handle_operator_token(t_list **tokens, char *input, int *i)
+void	handle_operator_token(t_token **tokens, char *input, int *i)
 {
 	char	*value;
 	t_token_type	type;
@@ -122,11 +112,11 @@ void	handle_operator_token(t_list **tokens, char *input, int *i)
 	}
 	if (!value)
 		return ;
-	ft_lstadd_back(tokens, create_token(value, type, false, false));
+	token_add_back(tokens, token_new(value, type, false, false));
 }
 
 
-t_list	*create_token(char *value, t_token_type type, bool was_quoted, bool was_single_quoted)
+/*t_list	*create_token(char *value, t_token_type type, bool was_quoted, bool was_single_quoted)
 {
 	t_token	*token;
 
@@ -138,11 +128,11 @@ t_list	*create_token(char *value, t_token_type type, bool was_quoted, bool was_s
 	token->was_quoted = was_quoted;
 	token->was_single_quoted = was_single_quoted;
 	return (ft_lstnew(token));
-}
+}*/
 
-t_list	*tokenize_input(char *input)
+t_token	*tokenize_input(char *input)
 {
-	t_list	*tokens = NULL;
+	t_token	*tokens = NULL;
 	int	i;
 
 	i = 0;
@@ -160,22 +150,6 @@ t_list	*tokenize_input(char *input)
 			handle_word_token(&tokens, input, &i);
 	}
 	return (tokens);
-}
-
-void	free_tokens(t_list *tokens)
-{
-	t_list	*tmp;
-	t_token	*token;
-
-	while (tokens)
-	{
-		tmp = tokens->next;
-		token = (t_token *)tokens->content;
-		free(token->value);
-		free(token);
-		free(tokens);
-		tokens = tmp;
-	}
 }
 
 const char	*token_type_to_str(t_token_type type)
@@ -196,21 +170,18 @@ const char	*token_type_to_str(t_token_type type)
 		return ("T_UNKNOWN");
 }
 
-void	print_tokens(t_list *tokens)
+void	print_tokens(t_token *tokens)
 {
-	t_token	*token;
 	int		i = 0;
 
 	while (tokens)
 	{
-		token = (t_token *)tokens->content;
 		printf("Token[%d]: %-13s | Type: %-13s | Quoted: %-3s | Single: %-3s\n",
 			i++,
-			token->value,
-			token_type_to_str(token->type),
-			token->was_quoted ? "yes" : "no",
-			token->was_single_quoted ? "yes" : "no"
-		);
+			tokens->value,
+			token_type_to_str(tokens->type),
+			tokens->was_quoted ? "yes" : "no",
+			tokens->was_single_quoted ? "yes" : "no");
 		tokens = tokens->next;
 	}
 }
@@ -218,7 +189,7 @@ void	print_tokens(t_list *tokens)
 int	main()
 {
 	char	*line;
-	t_list	*tokens;
+	t_token	*tokens;
 
 	while (1)
 	{
@@ -236,7 +207,7 @@ int	main()
 			write(2, "Syntax error!\n", 14);
 		else
 			write(1, "Valid syntax!\n", 15);
-		free_tokens(tokens);
+		free_tokens(&tokens);
 		free(line);
 	}
 	return (0);

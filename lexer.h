@@ -34,9 +34,9 @@ char    *ft_strndup(char *str, size_t n);
 int     is_operator(char c);
 int     is_space(char c);
 
-void    handle_quoted_token(t_token **tokens, char *input, int *i);
-void    handle_word_token(t_token **tokens, char *input, int *i);
-void    handle_operator_token(t_token **tokens, char *input, int *i);
+bool	handle_quoted_token(t_token **tokens, char *input, int *i);
+bool    handle_word_token(t_token **tokens, char *input, int *i);
+bool    handle_operator_token(t_token **tokens, char *input, int *i);
 
 //t_list  *create_token(char *value, t_token_type type, bool was_quoted, bool was_single_quoted);
 t_token  *tokenize_input(char *input);
@@ -53,7 +53,6 @@ void    print_tokens(t_token *tokens);
 bool    syntax_is_valid(t_token *tokens);
 bool    check_pipe_syntax(t_token *token);
 bool    check_redirection_syntax(t_token *tokens);
-bool    check_invalid_sequences(t_token *tokens);
 //bool    check_heredoc_delimiter(t_list *tokens);
 
 #endif

@@ -31,7 +31,7 @@ int	is_space(char c)
 	return (c == ' ' || (c >= 9 && c <= 13));
 }
 
-void	handle_quoted_token(t_token **tokens, char *input, int *i)
+bool	handle_quoted_token(t_token **tokens, char *input, int *i)
 {
 	char	quote_char;
 	int	start;
@@ -44,25 +44,30 @@ void	handle_quoted_token(t_token **tokens, char *input, int *i)
 	start = *i;
 	while (input[*i] && input[*i] != quote_char)
 		(*i)++;
+	if (input[*i] != quote_char)
+	{
+		write(2, "bash: unexpected EOF while looking for matching `", 49);
+		write(2, &quote_char, 1);
+		write(2, "'\n", 2);
+		return (false);
+	}
 	len = (*i) - start;
 	value = ft_strndup(input + start, len);
 	if (!value)
-		return ;
+		return (false) ;
 	new_token = token_new(value, T_WORD, true, quote_char == '\'');
 	if (!new_token)
 	{
 		free(value);
-		return ;
+		return (false);
 	}
 	token_add_back(tokens, new_token);
-	/*token->was_quoted = true;
-	if (quote_char == '\'')
-		token->was_single_quoted = true;*/
 	if (input[*i] == quote_char)
 		(*i)++; //skip closing quote
+	return (true);
 }
 
-void	handle_word_token(t_token **tokens, char *input, int *i)
+bool	handle_word_token(t_token **tokens, char *input, int *i)
 {
 	int	start;
 	char	*value;
@@ -73,17 +78,18 @@ void	handle_word_token(t_token **tokens, char *input, int *i)
 		(*i)++;
 	value = ft_strndup(input + start, *i - start);
 	if (!value)
-		return ;
+		return (false);
 	new_token = token_new(value, T_WORD, false, false);
 	if (!new_token)
 	{
 		free(value);
-		return ;
+		return (false);
 	}
 	token_add_back(tokens, new_token);
+	return (true);
 }
 
-void	handle_operator_token(t_token **tokens, char *input, int *i)
+bool	handle_operator_token(t_token **tokens, char *input, int *i)
 {
 	char	*value;
 	t_token_type	type;
@@ -126,14 +132,15 @@ void	handle_operator_token(t_token **tokens, char *input, int *i)
 		(*i)++;
 	}
 	if (!value)
-		return ;
+		return (false);
 	new_token = token_new(value, type, false, false);
 	if (!new_token)
 	{
 		free(value);
-		return ;
+		return (false);
 	}
 	token_add_back(tokens, new_token);
+	return (true);
 }
 
 
@@ -164,11 +171,31 @@ t_token	*tokenize_input(char *input)
 		if (!input[i])
 			break ;
 		if (input[i] == '"' || input[i] == '\'')
-			handle_quoted_token(&tokens, input, &i);
+		{
+			if (!handle_quoted_token(&tokens, input, &i))
+			{
+				free_tokens(&tokens);
+				return (NULL);
+			}
+		}
 		else if (is_operator(input[i]))
-			handle_operator_token(&tokens, input, &i);
+		{
+			if (!handle_operator_token(&tokens, input, &i))
+			{
+				free_tokens(&tokens);
+				write(2, "lexer error: invalid operator\n", 31);
+				return (NULL);
+			}
+		}
 		else
-			handle_word_token(&tokens, input, &i);
+		{
+			if (!handle_word_token(&tokens, input, &i))
+			{
+				free_tokens(&tokens);
+				write (2, "lexer error: failed to allocate word\n", 37);
+				return (NULL);
+			}
+		}
 	}
 	return (tokens);
 }
@@ -223,11 +250,18 @@ int	main()
 		if (*line)
 			add_history(line);
 		tokens = tokenize_input(line);
-		print_tokens(tokens);
+		if (!tokens)
+		{
+			free(line);
+			continue ;
+		}
 		if (!syntax_is_valid(tokens))
-			write(2, "Syntax error!\n", 14);
-		else
-			write(1, "Valid syntax!\n", 15);
+		{
+			free_tokens(&tokens);
+			free(line);
+			continue ;
+		}
+		print_tokens(tokens);
 		free_tokens(&tokens);
 		free(line);
 	}

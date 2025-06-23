@@ -21,7 +21,7 @@ int	main(int ac, char **av, char **envp)
 	char	**args = ft_split("env", ' ');
 	int	status = ft_env(av, envp);
 	if (status == 1)
-		printf("subject says : env with no options or arguments");
+		printf("subject says : env with no options or arguments hhhhhh");
 
 	for (int i = 0; args[i]; i++)
 		free(args[i]);

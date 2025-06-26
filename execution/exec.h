@@ -28,9 +28,24 @@ typedef struct s_cmd
 	struct s_cmd	*next;
 }	t_cmd;
 
+typedef struct s_env
+{
+	char	*key;
+	char	*value;
+	struct s_env	*next;
+}	t_env;
+
 /* builtins */
 int	ft_echo(char **argv);
 int	ft_pwd(void);
-int	ft_env(char **argv, char **envp);
+int	ft_env(char **argv, t_env *env);
+int	ft_export(char **argv, t_env **env);
+
+
+/* init_env_list */
+void	env_add_back(t_env **env, t_env *new);
+t_env	*env_new(char *key, char *value);
+t_env	*init_env_list(char **envp);
+int	ft_strcmp(char *s1, char *s2);
 
 #endif

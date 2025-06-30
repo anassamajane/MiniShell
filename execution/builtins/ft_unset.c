@@ -10,7 +10,6 @@ void	free_env_node(t_env *node)
 	}
 }
 
-
 void	remove_env_var(t_env **env, char *key)
 {
 	t_env	*curr;

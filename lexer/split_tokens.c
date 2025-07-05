@@ -119,16 +119,10 @@ bool	handle_operator_token(t_token **tokens, char *input, int *i)
 		value = ft_strndup("<", 1);
 		(*i)++;
 	}
-	else if (input[*i] == '>')
+	else (input[*i] == '>')
 	{
 		type = T_REDIR_OUT;
 		value = ft_strndup(">", 1);
-		(*i)++;
-	}
-	else
-	{
-		type = T_UNKNOWN;
-		value = ft_strndup(input + *i, 1);
 		(*i)++;
 	}
 	if (!value)

@@ -121,7 +121,7 @@ int	main(int ac, char **av, char **envp)
 	(void)ac;
 	int	status;
 
-	t_env	*env = init_env_list(envp);
+	t_env	*env = init_env_test_vim(envp);
 	status = ft_export(av, &env);
 	if (status == 0)
 	{

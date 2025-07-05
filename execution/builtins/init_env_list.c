@@ -1,6 +1,6 @@
 #include "../exec.h"
 
-t_env	*init_env_list(char **envp)
+t_env	*init_env_test_vim(char **envp)
 {
 	t_env	*env = NULL;
 	t_env	*new;

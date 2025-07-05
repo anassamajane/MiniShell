@@ -35,8 +35,8 @@ int main(void)
 {
 	char **cmd1 = ft_split("cd tkherbi9a", ' ');
 	char **cmd2 = ft_split("cd joj args", ' ');
-	char **cmd3 = ft_split("cd khdam", ' ');
-	char **cmd4 = ft_split("cd", ' ');
+	char **cmd3 = ft_split("cd ./khdam", ' ');
+	char **cmd4 = ft_split("cd ..", ' ');
 
 	ft_cd(cmd1);
 	print_curr_dir();

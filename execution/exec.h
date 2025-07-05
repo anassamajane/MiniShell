@@ -4,6 +4,9 @@
 # include <stdio.h>
 # include <unistd.h>
 # include <stdlib.h>
+# include <fcntl.h>
+# include <sys/wait.h>
+# include <readline/readline.h>
 # include "../libft/libft.h"
 
 typedef enum s_redir_type
@@ -40,6 +43,7 @@ int	ft_echo(char **argv);
 int	ft_pwd(void);
 int	ft_env(char **argv, t_env *env);
 int	ft_export(char **argv, t_env **env);
+int	ft_unset(char **argv, t_env **env);
 
 
 /* init_env_list */

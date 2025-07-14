@@ -31,7 +31,7 @@ int	is_space(char c)
 	return (c == ' ' || (c >= 9 && c <= 13));
 }
 
-bool	handle_quoted_token(t_token **tokens, char *input, int *i)
+/*bool	handle_quoted_token(t_token **tokens, char *input, int *i)
 {
 	char	quote_char;
 	int	start;
@@ -40,8 +40,9 @@ bool	handle_quoted_token(t_token **tokens, char *input, int *i)
 	t_token	*new_token;
 
 	quote_char = input[*i];
-	(*i)++; //skip quote
 	start = *i;
+	(*i)++; //skip quote
+	//start = *i;
 	while (input[*i] && input[*i] != quote_char)
 		(*i)++;
 	if (input[*i] != quote_char)
@@ -51,7 +52,7 @@ bool	handle_quoted_token(t_token **tokens, char *input, int *i)
 		write(2, "'\n", 2);
 		return (false);
 	}
-	len = (*i) - start;
+	len = (*i) - start + 1;
 	value = ft_strndup(input + start, len);
 	if (!value)
 		return (false) ;
@@ -65,9 +66,9 @@ bool	handle_quoted_token(t_token **tokens, char *input, int *i)
 	if (input[*i] == quote_char)
 		(*i)++; //skip closing quote
 	return (true);
-}
+}*/
 
-bool	handle_word_token(t_token **tokens, char *input, int *i)
+/*bool	handle_word_token(t_token **tokens, char *input, int *i)
 {
 	int	start;
 	char	*value;
@@ -87,7 +88,7 @@ bool	handle_word_token(t_token **tokens, char *input, int *i)
 	}
 	token_add_back(tokens, new_token);
 	return (true);
-}
+}*/
 
 bool	handle_operator_token(t_token **tokens, char *input, int *i)
 {
@@ -119,7 +120,7 @@ bool	handle_operator_token(t_token **tokens, char *input, int *i)
 		value = ft_strndup("<", 1);
 		(*i)++;
 	}
-	else (input[*i] == '>')
+	else if (input[*i] == '>')
 	{
 		type = T_REDIR_OUT;
 		value = ft_strndup(">", 1);
@@ -137,7 +138,7 @@ bool	handle_operator_token(t_token **tokens, char *input, int *i)
 	return (true);
 }
 
-t_token	*tokenize_input(char *input)
+/*t_token	*tokenize_input(char *input)
 {
 	t_token	*tokens = NULL;
 	int	i;
@@ -177,7 +178,123 @@ t_token	*tokenize_input(char *input)
 		}
 	}
 	return (tokens);
+}*/
+
+char	*append_char_to_buffer(char *buffer, char c)
+{
+	char	*new_buf;
+	size_t	len;
+	size_t	i;
+
+	if (!buffer)
+		len = 0;
+	else
+		len = ft_strlen(buffer);
+	new_buf = malloc(len + 2);
+	if (!new_buf)
+		return (NULL);
+	i = 0;
+	while (i < len)
+	{
+		new_buf[i] = buffer[i];
+		i++;
+	}
+	new_buf[i++] = c;
+	new_buf[i] = '\0';
+	free(buffer);
+	return (new_buf);
 }
+
+bool	append_quoted_segment(char **buffer, char *input, int *i)
+{
+	char	quote = input[*i];
+	*buffer = append_char_to_buffer(*buffer, quote);
+	(*i)++;
+	while (input[*i])
+	{
+		*buffer = append_char_to_buffer(*buffer, input[*i]);
+		if (!(*buffer))
+			return (false);
+		if (input[*i] == quote)
+		{
+			(*i)++;
+			break ;
+		}
+		(*i)++;
+	}
+	return (true);
+}
+
+bool	collect_word_token(t_token **tokens, char *input, int *i)
+{
+	char	*buffer;
+	t_token	*new_token;
+
+	buffer = NULL;
+	while (input[*i])
+	{
+		if (is_space(input[*i]) || is_operator(input[*i]))
+			break ;
+		if (input[*i] == '\'' || input[*i] == '"')
+		{
+			if (!append_quoted_segment(&buffer, input, i))
+			{
+				free(buffer);
+				return (false);
+			}
+		}
+		else
+		{
+			buffer = append_char_to_buffer(buffer, input[*i]);
+			if (!buffer)
+				return (false);
+			(*i)++;
+		}
+	}
+	new_token = token_new(buffer, T_WORD, false, false);
+	if (!new_token)
+	{
+		free(buffer);
+		return (false);
+	}
+	token_add_back(tokens, new_token);
+	return (true);
+}
+
+t_token	*tokenize_input(char *input)
+{
+	t_token	*tokens = NULL;
+	int		i;
+
+	i = 0;
+	while (input[i])
+	{
+		while (input[i] && is_space(input[i]))
+			i++;
+		if (!input[i])
+			break ;
+		if (is_operator(input[i]))
+		{
+			if (!handle_operator_token(&tokens, input, &i))
+			{
+				free_tokens(&tokens);
+				write(2, "lexer error: invalid operator\n", 31);
+				return (NULL);
+			}
+		}
+		else
+		{
+			if (!collect_word_token(&tokens, input, &i))
+			{
+				free_tokens(&tokens);
+				write(2, "lexer error: failed to collect word\n", 37);
+				return (NULL);
+			}
+		}
+	}
+	return (tokens);
+}
+
 
 const char	*token_type_to_str(t_token_type type)
 {

@@ -1,5 +1,8 @@
 #include "../exec.h"
-
+int	_is_var_char(int c)
+{
+	return (ft_isalnum(c) || c == '_');
+}
 int	ft_strcmp(char *s1, char *s2)
 {
 	int	i;
@@ -60,7 +63,24 @@ t_env	*find_new(t_env *env, char *key)
 	}
 	return (NULL);
 }
-
+int check_valide_key(char *arg, char *equale_signe)
+{
+	if (!equale_signe)
+	{
+		write(2, "bash: export: invalid argument\n", 32);
+		return (1);
+	}
+	while (arg != equale_signe)
+	{
+		if (!_is_var_char(*arg))
+		{
+			write(2, "bash: export: invalid argument\n", 32);
+			return (1);
+		}
+		arg++;
+	}
+	return (0);
+}
 int	update_or_add_env(char *arg, t_env **env)
 {
 	char	*equal_sign;
@@ -70,11 +90,9 @@ int	update_or_add_env(char *arg, t_env **env)
 	size_t	key_len;
 
 	equal_sign = ft_strchr(arg, '=');
-	if (!equal_sign)
-	{
-		write(2, "bash: export: invalid argument\n", 32);
+	//this function checks the key if it's not alphanumerique
+	if (check_valide_key(arg, equal_sign))
 		return (1);
-	}
 	key_len = equal_sign - arg;
 	key = ft_substr(arg, 0, key_len);
 	if (!key)

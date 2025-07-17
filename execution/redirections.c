@@ -80,7 +80,7 @@ t_redir	*new_redir(t_redir_type type, char *filename)
 	return (redir);
 }
 
-int	main(int ac, char **av, char **envp)
+/*int	main(int ac, char **av, char **envp)
 {
 	(void)ac;
 	(void)av;
@@ -107,4 +107,4 @@ int	main(int ac, char **av, char **envp)
 	}
 	else
 		wait(NULL);
-}
+}*/

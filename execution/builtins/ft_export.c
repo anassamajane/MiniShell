@@ -3,6 +3,7 @@ int	_is_var_char(int c)
 {
 	return (ft_isalnum(c) || c == '_');
 }
+
 int	ft_strcmp(char *s1, char *s2)
 {
 	int	i;
@@ -63,7 +64,7 @@ t_env	*find_new(t_env *env, char *key)
 	}
 	return (NULL);
 }
-int check_valide_key(char *arg, char *equale_signe)
+int	check_valide_key(char *arg, char *equale_signe)
 {
 	if (!equale_signe)
 	{
@@ -81,6 +82,7 @@ int check_valide_key(char *arg, char *equale_signe)
 	}
 	return (0);
 }
+
 int	update_or_add_env(char *arg, t_env **env)
 {
 	char	*equal_sign;

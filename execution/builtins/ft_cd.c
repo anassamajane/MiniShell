@@ -31,7 +31,7 @@ void	print_curr_dir(void)
 	}
 }
 
-int main(void)
+/*int main(void)
 {
 	char **cmd1 = ft_split("cd tkherbi9a", ' ');
 	char **cmd2 = ft_split("cd joj args", ' ');
@@ -47,4 +47,4 @@ int main(void)
 	ft_cd(cmd4);
 	print_curr_dir();
 
-}
+}*/

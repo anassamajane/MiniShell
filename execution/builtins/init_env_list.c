@@ -1,6 +1,6 @@
 #include "../exec.h"
 
-t_env	*init_env_test_vim(char **envp)
+t_env	*init_env_list(char **envp)
 {
 	t_env	*env = NULL;
 	t_env	*new;
@@ -24,8 +24,9 @@ t_env	*init_env_test_vim(char **envp)
 	}
 	return (env);
 }
-/*
-int	main(int ac, char **av, char **envp)
+
+
+/*int	main(int ac, char **av, char **envp)
 {
 	(void)ac;
 	(void)av;

@@ -20,5 +20,6 @@ int	is_numeric(char *str)
 
 int	ft_exit(char **argv, int last_status)
 {
-	return (value % 256)
+	last_status = 1;
+	return (last_status);//still need the last return value of the program to handle ft_exit
 }

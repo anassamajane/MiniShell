@@ -44,7 +44,7 @@ int	ft_pwd(void);
 int	ft_env(char **argv, t_env *env);
 int	ft_export(char **argv, t_env **env);
 int	ft_unset(char **argv, t_env **env);
-
+int	ft_exit(char **argv, int last_status);
 
 /* init_env_list */
 void	env_add_back(t_env **env, t_env *new);
@@ -52,4 +52,15 @@ t_env	*env_new(char *key, char *value);
 t_env	*init_env_list(char **envp);
 int	ft_strcmp(char *s1, char *s2);
 
+
+int	handle_redirections(t_redir *redir);
+char	*find_cmd_path(char *cmd, t_env *env);
+
+int	is_builtin(char *cmd);
+int	run_builtin(t_cmd *cmd, t_env **env);
+int	is_single_builtin(t_cmd *cmd);
+void	free_env_list(t_env *env);//temporary
+
+
+int	ft_cd(char **argv);
 #endif
